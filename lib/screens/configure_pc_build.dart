@@ -135,6 +135,65 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
     calculateTotalPrice();
   }
 
+  void _deleteCpu() {
+    setState(() {
+      selectedCpu = null;
+      selectedCooler = null;
+      selectedMotherboard = null;
+    });
+    calculateTotalPrice();
+  }
+
+  void _deleteCooler() {
+    setState(() {
+      selectedCooler = null;
+    });
+    calculateTotalPrice();
+  }
+
+  void _deleteMotherboard() {
+    setState(() {
+      selectedMotherboard = null;
+      selectedRam = null;
+    });
+    calculateTotalPrice();
+  }
+
+  void _deleteRam() {
+    setState(() {
+      selectedRam = null;
+    });
+    calculateTotalPrice();
+  }
+
+  void _deleteStorage() {
+    setState(() {
+      selectedStorage = null;
+    });
+    calculateTotalPrice();
+  }
+
+  void _deleteGpu() {
+    setState(() {
+      selectedGpu = null;
+    });
+    calculateTotalPrice();
+  }
+
+  void _deleteCase() {
+    setState(() {
+      selectedCase = null;
+    });
+    calculateTotalPrice();
+  }
+
+  void _deletePsu() {
+    setState(() {
+      selectedPsu = null;
+    });
+    calculateTotalPrice();
+  }
+
   void calculateTotalPrice() {
     totalPrice = 0.0;
 
@@ -189,9 +248,9 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle("CPU"),
-        if (selectedCpu != null) _buildSelectedCpuCard(selectedCpu!),
-        const SizedBox(height: 10),
-        _buildSelectButton("Scegli una CPU", availableCpus, selectCpu),
+        selectedCpu != null
+            ? _buildSelectedCpuCard(selectedCpu!)
+            : _buildSelectButton("Scegli una CPU", availableCpus, selectCpu),
       ],
     );
   }
@@ -206,10 +265,10 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle("Dissipatore CPU"),
-        if (selectedCooler != null) _buildSelectedCoolerCard(selectedCooler!),
-        const SizedBox(height: 10),
-        _buildSelectButton(
-            "Scegli un dissipatore", compatibleCoolers, selectCooler),
+        selectedCooler != null
+            ? _buildSelectedCoolerCard(selectedCooler!)
+            : _buildSelectButton(
+                "Scegli un dissipatore", compatibleCoolers, selectCooler),
       ],
     );
   }
@@ -226,11 +285,10 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle("Scheda Madre"),
-        if (selectedMotherboard != null)
-          _buildSelectedMotherboardCard(selectedMotherboard!),
-        const SizedBox(height: 10),
-        _buildSelectButton("Scegli una Scheda Madre", compatibleMotherboards,
-            selectMotherboard),
+        selectedMotherboard != null
+            ? _buildSelectedMotherboardCard(selectedMotherboard!)
+            : _buildSelectButton("Scegli una Scheda Madre",
+                compatibleMotherboards, selectMotherboard),
       ],
     );
   }
@@ -240,9 +298,9 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle("RAM"),
-        if (selectedRam != null) _buildSelectedRamCard(selectedRam!),
-        const SizedBox(height: 10),
-        _buildSelectButton("Scegli una RAM", availableRams, selectRam),
+        selectedRam != null
+            ? _buildSelectedRamCard(selectedRam!)
+            : _buildSelectButton("Scegli una RAM", availableRams, selectRam),
       ],
     );
   }
@@ -252,9 +310,9 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle("GPU"),
-        if (selectedGpu != null) _buildSelectedGpuCard(selectedGpu!),
-        const SizedBox(height: 10),
-        _buildSelectButton("Scegli una GPU", availableGpus, selectGpu),
+        selectedGpu != null
+            ? _buildSelectedGpuCard(selectedGpu!)
+            : _buildSelectButton("Scegli una GPU", availableGpus, selectGpu),
       ],
     );
   }
@@ -264,9 +322,9 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle("Case"),
-        if (selectedCase != null) _buildSelectedCaseCard(selectedCase!),
-        const SizedBox(height: 10),
-        _buildSelectButton("Scegli un Case", availableCases, selectCase),
+        selectedCase != null
+            ? _buildSelectedCaseCard(selectedCase!)
+            : _buildSelectButton("Scegli un Case", availableCases, selectCase),
       ],
     );
   }
@@ -276,19 +334,9 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle("PSU"),
-        if (selectedPsu != null) _buildSelectedPsuCard(selectedPsu!),
-        const SizedBox(height: 10),
-        _buildSelectButton("Scegli una PSU", availablePsus, selectPsu),
-      ],
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Row(
-      children: [
-        Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(width: 8),
-        const Expanded(child: Divider(color: Colors.black, thickness: 1)),
+        selectedPsu != null
+            ? _buildSelectedPsuCard(selectedPsu!)
+            : _buildSelectButton("Scegli una PSU", availablePsus, selectPsu),
       ],
     );
   }
@@ -298,11 +346,25 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle("Storage"),
-        if (selectedStorage != null)
-          _buildSelectedStorageCard(selectedStorage!),
-        const SizedBox(height: 10),
-        _buildSelectButton(
-            "Scegli uno Storage", availableStorage, selectStorage),
+        selectedStorage != null
+            ? _buildSelectedStorageCard(selectedStorage!)
+            : _buildSelectButton(
+                "Scegli uno Storage", availableStorage, selectStorage),
+      ],
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(width: 8),
+            const Expanded(child: Divider(color: Colors.black, thickness: 1)),
+          ],
+        ),
+        const SizedBox(height: 8),
       ],
     );
   }
@@ -325,15 +387,13 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
   }
 
   Widget _buildSelectedCpuCard(Cpu cpu) {
-    return _buildSelectedCard(cpu.name,
-        "Brand: ${cpu.brand} • Socket: ${cpu.socket} • ${cpu.tdp}W", cpu.price);
+    return _buildSelectedCard(
+        cpu.name, "Brand: ${cpu.brand} • Socket: ${cpu.socket}", cpu.price);
   }
 
   Widget _buildSelectedCoolerCard(CpuCooler cooler) {
     return _buildSelectedCard(
-        cooler.name,
-        "Brand: ${cooler.brand} • TDP Max: ${cooler.tdpSupport}W",
-        cooler.price);
+        cooler.name, "Brand: ${cooler.brand} ", cooler.price);
   }
 
   Widget _buildSelectedRamCard(Ram ram) {
@@ -347,7 +407,7 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
   Widget _buildSelectedStorageCard(Storage storage) {
     return _buildSelectedCard(
       storage.name,
-      "Brand: ${storage.brand} • Capacity: ${storage.capacity}GB",
+      "Brand: ${storage.brand} • Capacity: ${storage.capacity}GB • Type: ${storage.type}",
       storage.price,
     );
   }
@@ -355,7 +415,7 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
   Widget _buildSelectedGpuCard(Gpu gpu) {
     return _buildSelectedCard(
       gpu.name,
-      "Brand: ${gpu.brand} ",
+      "Brand: ${gpu.brand} • Length: ${gpu.length}mm",
       gpu.price,
     );
   }
@@ -363,7 +423,7 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
   Widget _buildSelectedCaseCard(Case cases) {
     return _buildSelectedCard(
       cases.name,
-      "Brand: ${cases.brand} ",
+      "Brand: ${cases.brand} • Form Factor: ${cases.formFactorSupport.join(', ')}",
       cases.price,
     );
   }
@@ -371,12 +431,11 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
   Widget _buildSelectedPsuCard(Psu psu) {
     return _buildSelectedCard(
       psu.name,
-      "Brand: ${psu.brand} ",
+      "Brand: ${psu.brand} • Rating: ${psu.efficiencyRating}",
       psu.price,
     );
   }
 
-  // Aggiungi la card per la motherboard selezionata
   Widget _buildSelectedMotherboardCard(Motherboard motherboard) {
     return _buildSelectedCard(
         motherboard.name,
@@ -390,9 +449,38 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: ListTile(
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(subtitle),
-        trailing: Text("\$${price.toStringAsFixed(2)}",
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        subtitle:
+            Text(subtitle), // Qui metti le info dettagliate sul componente
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("\$${price.toStringAsFixed(2)}",
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () {
+                if (title == selectedCpu?.name) {
+                  _deleteCpu();
+                } else if (title == selectedCooler?.name) {
+                  _deleteCooler();
+                } else if (title == selectedMotherboard?.name) {
+                  _deleteMotherboard();
+                } else if (title == selectedRam?.name) {
+                  _deleteRam();
+                } else if (title == selectedStorage?.name) {
+                  _deleteStorage();
+                } else if (title == selectedGpu?.name) {
+                  _deleteGpu();
+                } else if (title == selectedCase?.name) {
+                  _deleteCase();
+                } else if (title == selectedPsu?.name) {
+                  _deletePsu();
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -441,7 +529,7 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
                 } else if (item is CpuCooler) {
                   itemName = item.name;
                   itemDetails =
-                      "Brand: ${item.brand} • TDP Max: ${item.tdpSupport}W";
+                      "Brand: ${item.brand} • TDP Max: ${item.tdpSupport}W ";
                   itemPrice = item.price;
                 } else if (item is Motherboard) {
                   itemName = item.name;
@@ -455,19 +543,23 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
                   itemPrice = item.price;
                 } else if (item is Gpu) {
                   itemName = item.name;
-                  itemDetails = "Brand: ${item.brand} ";
+                  itemDetails =
+                      "Brand: ${item.brand} • Lenght: ${item.length}mm • PCI: ${item.pciVersion} • ${item.powerDraw}W";
                   itemPrice = item.price;
                 } else if (item is Case) {
                   itemName = item.name;
-                  itemDetails = "Brand: ${item.brand} ";
+                  itemDetails =
+                      "Brand: ${item.brand} • Form Factor:${item.formFactorSupport} • MAX GPU Lenght: ${item.maxGpuLength}mm • MAX PSU Lenght: ${item.maxPsuLength}mm";
                   itemPrice = item.price;
                 } else if (item is Psu) {
                   itemName = item.name;
-                  itemDetails = "Brand: ${item.brand} ";
+                  itemDetails =
+                      "Brand: ${item.brand} • Efficiency: ${item.efficiencyRating} • Wattage: ${item.wattage}W";
                   itemPrice = item.price;
                 } else if (item is Storage) {
                   itemName = item.name;
-                  itemDetails = "Brand: ${item.brand} ";
+                  itemDetails =
+                      "Brand: ${item.brand} • Capacity: ${item.capacity}GB • Type: ${item.type} • Interface: ${item.interface}";
                   itemPrice = item.price;
                 }
 

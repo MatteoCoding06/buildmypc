@@ -56,6 +56,26 @@ class ProfileScreen extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 30),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: InkWell(
+                child: ListView(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: const [
+                    ListTile(
+                      title: Text("Logout"),
+                      trailing: Icon(Icons.logout),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),

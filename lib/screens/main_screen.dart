@@ -42,12 +42,6 @@ class _MainScreenState extends State<MainScreen> {
         title: Text(
           ["Home", "Explore", "Profile"][_selectedIndex],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => logout(context),
-          ),
-        ],
       ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
