@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:buildmypc/screens/auth_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+
+  void logout(BuildContext context) {
+    Supabase.instance.client.auth.signOut();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const AuthScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +74,7 @@ class ProfileScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: InkWell(
+                onTap: () => logout(context),
                 child: ListView(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),

@@ -4,6 +4,8 @@ import 'package:buildmypc/models/motherboard.dart';
 import 'package:buildmypc/models/psu.dart';
 import 'package:buildmypc/models/ram.dart';
 import 'package:buildmypc/models/storage.dart';
+import 'package:buildmypc/screens/auth_screen.dart';
+import 'package:buildmypc/services/auth_service.dart';
 import 'package:buildmypc/services/case_service.dart';
 import 'package:buildmypc/services/gpu_service.dart';
 import 'package:buildmypc/services/psu_service.dart';
@@ -15,6 +17,8 @@ import 'package:buildmypc/services/cpu_cooler_service.dart';
 import 'package:buildmypc/services/motherboard_service.dart';
 import 'package:buildmypc/models/cpu.dart';
 import 'package:buildmypc/models/cpu_cooler.dart';
+import 'package:buildmypc/services/pc_build_service.dart';
+import 'package:uuid/uuid.dart';
 
 class ConfigurePcBuild extends StatefulWidget {
   const ConfigurePcBuild({super.key});
@@ -212,7 +216,45 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Configura il tuo PC")),
+      appBar: AppBar(
+        title: const Text("Configura il tuo PC"),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              switch (value) {
+                case 'load':
+                  _showLoadBuildDialog();
+                  break;
+                case 'save':
+                  _showSaveBuildDialog();
+                  break;
+                case 'share':
+
+                  //TODO: Azione per Condividi
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'load',
+                child: Text('Carica Build'),
+              ),
+              const PopupMenuItem(
+                value: 'save',
+                child: Text('Salva'),
+              ),
+              const PopupMenuItem(
+                value: 'share',
+                child: Text('Condividi'),
+              ),
+            ],
+            icon: const Icon(Icons.more_horiz),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -598,5 +640,276 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
         ],
       ),
     );
+  }
+
+  void _showLoadBuildDialog() {
+    _loadUserBuilds(); // Carica le build prima di mostrare il dialogo
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Carica Build'),
+        content: userBuilds.isEmpty
+            ? const Center(child: Text("Nessuna build salvata"))
+            : SingleChildScrollView(
+                child: ListBody(
+                  children: userBuilds.map((build) {
+                    return ListTile(
+                      title: Text(build.name),
+                      trailing:
+                          Text("\$${build.totalPrice.toStringAsFixed(2)}"),
+                      onTap: () {
+                        // Aggiorna la build corrente con la build selezionata
+                        _loadSelectedBuild(build);
+                        Navigator.pop(
+                            context); // Chiudi il dialogo dopo aver selezionato la build
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+      ),
+    );
+  }
+
+  Future<void> _loadSelectedBuild(PcBuild build) async {
+    // Esegui prima le operazioni asincrone
+    Cpu? cpu = await getCpuById(build.cpuId);
+    CpuCooler? cooler =
+        build.coolerId != null ? await getCoolerById(build.coolerId!) : null;
+    Motherboard? motherboard = await getMotherboardById(build.motherboardId);
+    Ram? ram = await getRamById(build.ramId);
+    Storage? storage = await getStorageById(build.storageId);
+    Gpu? gpu = build.gpuId != null ? await getGpuById(build.gpuId!) : null;
+    Case? pcCase = await getCaseById(build.caseId);
+    Psu? psu = await getPsuById(build.psuId);
+
+    // Poi, aggiorna lo stato sincronicamente
+    setState(() {
+      selectedCpu = cpu;
+      selectedCooler = cooler;
+      selectedMotherboard = motherboard;
+      selectedRam = ram;
+      selectedStorage = storage;
+      selectedGpu = gpu;
+      selectedCase = pcCase;
+      selectedPsu = psu;
+
+      // Ricalcola il prezzo totale
+      calculateTotalPrice();
+    });
+  }
+
+  void _showSaveBuildDialog() {
+    // Verifica se l'utente è autenticato
+    final user = AuthService().supabase.auth.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              const Text('Devi effettuare l\'accesso per salvare la build'),
+          action: SnackBarAction(
+            label: 'Login',
+            onPressed: () {
+              // Naviga alla pagina di login
+              MaterialPageRoute(builder: (context) => const AuthScreen());
+            },
+          ),
+        ),
+      );
+      return;
+    }
+
+    final nameController = TextEditingController();
+    final descriptionController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Salva Build'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: 'Nome della build',
+                hintText: 'Es: Gaming Build 2025',
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Descrizione (opzionale)',
+                hintText: 'Es: Build per gaming ad alte prestazioni',
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Annulla'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              if (nameController.text.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text('Inserisci un nome per la build')),
+                );
+                return;
+              }
+
+              if (selectedCpu == null ||
+                  selectedMotherboard == null ||
+                  selectedRam == null ||
+                  selectedStorage == null ||
+                  selectedCase == null ||
+                  selectedPsu == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text('Seleziona tutti i componenti essenziali')),
+                );
+                return;
+              }
+
+              try {
+                final build = PcBuild(
+                  id: const Uuid().v4(), // Genera un UUID univoco per la build
+                  userId: user.id, // ID dell'utente corrente
+                  name: nameController.text,
+                  description: descriptionController.text.isEmpty
+                      ? null
+                      : descriptionController.text,
+                  cpuId: selectedCpu!.id,
+                  coolerId: selectedCooler?.id,
+                  motherboardId: selectedMotherboard!.id,
+                  ramId: selectedRam!.id,
+                  storageId: selectedStorage!.id,
+                  gpuId: selectedGpu?.id,
+                  caseId: selectedCase!.id,
+                  psuId: selectedPsu!.id,
+                  totalPrice: totalPrice,
+                  createdAt: DateTime.now(),
+                );
+
+                final buildService = BuildService(AuthService().supabase);
+                await buildService.saveBuild(build);
+
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Build salvata con successo!')),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Errore durante il salvataggio: $e')),
+                );
+              }
+            },
+            child: const Text('Salva'),
+          ),
+        ],
+      ),
+    );
+  }
+
+// Funzioni per ottenere gli oggetti completi (esempio con CPU)
+  Future<Cpu> getCpuById(int cpuId) async {
+    final response = await AuthService()
+        .supabase
+        .from('cpu')
+        .select()
+        .eq('id', cpuId)
+        .single();
+    return Cpu.fromJson(response); // Restituisce l'oggetto Cpu completo
+  }
+
+  Future<CpuCooler> getCoolerById(int coolerId) async {
+    final response = await AuthService()
+        .supabase
+        .from('cpu_cooler')
+        .select()
+        .eq('id', coolerId)
+        .single();
+    return CpuCooler.fromJson(
+        response); // Restituisce l'oggetto Cooler completo
+  }
+
+  Future<Motherboard> getMotherboardById(int motherboardId) async {
+    final response = await AuthService()
+        .supabase
+        .from('motherboards')
+        .select()
+        .eq('id', motherboardId)
+        .single();
+    return Motherboard.fromJson(
+        response); // Restituisce l'oggetto Motherboard completo
+  }
+
+  Future<Ram> getRamById(int ramId) async {
+    final response = await AuthService()
+        .supabase
+        .from('ram')
+        .select()
+        .eq('id', ramId)
+        .single();
+    return Ram.fromJson(response); // Restituisce l'oggetto Ram completo
+  }
+
+  Future<Storage> getStorageById(int storageId) async {
+    final response = await AuthService()
+        .supabase
+        .from('storage')
+        .select()
+        .eq('id', storageId)
+        .single();
+    return Storage.fromJson(response); // Restituisce l'oggetto Storage completo
+  }
+
+  Future<Gpu> getGpuById(int gpuId) async {
+    final response = await AuthService()
+        .supabase
+        .from('gpu')
+        .select()
+        .eq('id', gpuId)
+        .single();
+    return Gpu.fromJson(response); // Restituisce l'oggetto GPU completo
+  }
+
+  Future<Case> getCaseById(int caseId) async {
+    final response = await AuthService()
+        .supabase
+        .from('cases')
+        .select()
+        .eq('id', caseId)
+        .single();
+    return Case.fromJson(response); // Restituisce l'oggetto Case completo
+  }
+
+  Future<Psu> getPsuById(int psuId) async {
+    final response = await AuthService()
+        .supabase
+        .from('psu')
+        .select()
+        .eq('id', psuId)
+        .single();
+    return Psu.fromJson(response); // Restituisce l'oggetto PSU completo
+  }
+
+  List<PcBuild> userBuilds = [];
+
+  void _loadUserBuilds() async {
+    try {
+      final loadedConfig =
+          await BuildService(AuthService().supabase).getUserBuilds();
+      setState(() {
+        userBuilds = loadedConfig; // Aggiungi tutte le build caricate
+      });
+    } catch (e) {
+      print("Errore nel caricare le build: $e");
+    }
   }
 }
