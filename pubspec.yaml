@@ -35,6 +35,7 @@ dependencies:
   json_serializable: ^6.7.1 # Parsing JSON
   flutter_secure_storage: ^9.0.0 # Per token di login
   uuid: ^4.0.0
+  flutter_slidable: ^4.0.0 # Per la gestione delle build
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

@@ -18,6 +18,7 @@ import 'package:buildmypc/services/motherboard_service.dart';
 import 'package:buildmypc/models/cpu.dart';
 import 'package:buildmypc/models/cpu_cooler.dart';
 import 'package:buildmypc/services/pc_build_service.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:uuid/uuid.dart';
 
 class ConfigurePcBuild extends StatefulWidget {
@@ -486,42 +487,50 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
   }
 
   Widget _buildSelectedCard(String title, String subtitle, double price) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: ListTile(
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle:
-            Text(subtitle), // Qui metti le info dettagliate sul componente
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text("\$${price.toStringAsFixed(2)}",
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: () {
-                if (title == selectedCpu?.name) {
-                  _deleteCpu();
-                } else if (title == selectedCooler?.name) {
-                  _deleteCooler();
-                } else if (title == selectedMotherboard?.name) {
-                  _deleteMotherboard();
-                } else if (title == selectedRam?.name) {
-                  _deleteRam();
-                } else if (title == selectedStorage?.name) {
-                  _deleteStorage();
-                } else if (title == selectedGpu?.name) {
-                  _deleteGpu();
-                } else if (title == selectedCase?.name) {
-                  _deleteCase();
-                } else if (title == selectedPsu?.name) {
-                  _deletePsu();
-                }
-              },
-            ),
-          ],
+    return Slidable(
+      endActionPane: ActionPane(motion: StretchMotion(), children: [
+        SlidableAction(
+          onPressed: (context) {
+            if (title == selectedCpu?.name) {
+              _deleteCpu();
+            } else if (title == selectedCooler?.name) {
+              _deleteCooler();
+            } else if (title == selectedMotherboard?.name) {
+              _deleteMotherboard();
+            } else if (title == selectedRam?.name) {
+              _deleteRam();
+            } else if (title == selectedStorage?.name) {
+              _deleteStorage();
+            } else if (title == selectedGpu?.name) {
+              _deleteGpu();
+            } else if (title == selectedCase?.name) {
+              _deleteCase();
+            } else if (title == selectedPsu?.name) {
+              _deletePsu();
+            }
+          },
+          icon: Icons.delete,
+          label: 'Elimina',
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.red,
+        ),
+      ]),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        child: ListTile(
+          title:
+              Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          subtitle:
+              Text(subtitle), // Qui metti le info dettagliate sul componente
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("\$${price.toStringAsFixed(2)}",
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold)),
+            ],
+          ),
         ),
       ),
     );

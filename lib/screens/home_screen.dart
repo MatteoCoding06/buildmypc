@@ -1,8 +1,37 @@
 import 'package:buildmypc/screens/configure_pc_build.dart';
+import 'package:buildmypc/screens/my_configurations.dart';
+import 'package:buildmypc/services/auth_service.dart';
+import 'package:buildmypc/services/pc_build_service.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<PcBuild> userBuilds = [];
+
+  // Funzione per caricare le build dell'utente
+  void _loadUserBuilds() async {
+    try {
+      final loadedConfig =
+          await BuildService(AuthService().supabase).getUserBuilds();
+      setState(() {
+        userBuilds = loadedConfig; // Aggiungi tutte le build caricate
+      });
+    } catch (e) {
+      print("Errore nel caricare le build: $e");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserBuilds(); // Carica le build quando la schermata viene inizializzata
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,71 +71,81 @@ class HomeScreen extends StatelessWidget {
                     elevation: 4,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: InkWell(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Configura PC",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            ),
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(Icons.build),
-                              color: Colors.white,
-                            ),
-                          ],
-                        ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Configura PC",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          IconButton(
+                            onPressed: () {},
+                            icon: const Icon(Icons.build),
+                            color: Colors.white,
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: AspectRatio(
-                        aspectRatio: 1,
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          color: Colors.white,
-                          elevation: 4,
-                          child: Stack(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Align(
-                                  alignment: Alignment.topLeft,
-                                  child: const Text(
-                                    "Le mie configurazioni",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.purple),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SavedBuildsPage(
+                                  // Passaggio delle build
+                                  ),
+                            ),
+                          );
+                        },
+                        child: AspectRatio(
+                          aspectRatio: 1,
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            color: Colors.white,
+                            elevation: 4,
+                            child: Stack(
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.all(16.0),
+                                  child: Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Text(
+                                      "Le mie configurazioni",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.purple),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Align(
-                                alignment: Alignment.bottomRight,
-                                child: IconButton(
-                                  iconSize: 48,
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.library_books),
-                                  color: Colors.purple,
+                                Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: IconButton(
+                                    iconSize: 48,
+                                    onPressed: () {},
+                                    icon: const Icon(Icons.library_books),
+                                    color: Colors.purple,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16), // Spazio tra le card
+                    const SizedBox(width: 16),
                     Expanded(
                       child: AspectRatio(
                         aspectRatio: 1,
@@ -118,11 +157,11 @@ class HomeScreen extends StatelessWidget {
                           elevation: 4,
                           child: Stack(
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.all(16.0),
+                              const Padding(
+                                padding: EdgeInsets.all(16.0),
                                 child: Align(
                                   alignment: Alignment.topLeft,
-                                  child: const Text(
+                                  child: Text(
                                     "Componenti",
                                     style: TextStyle(
                                         fontSize: 16,
@@ -150,8 +189,7 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 // Configurazioni consigliate
                 SizedBox(
-                  width: double
-                      .infinity, // Imposta la larghezza al 100% del genitore
+                  width: double.infinity,
                   child: Card(
                     color: Colors.white,
                     shape: RoundedRectangleBorder(
@@ -162,7 +200,7 @@ class HomeScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
-                          Row(
+                          const Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
@@ -177,21 +215,22 @@ class HomeScreen extends StatelessWidget {
                           ),
                           ListView(
                             shrinkWrap: true,
-                            children: [
-                              const ListTile(
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: const [
+                              ListTile(
                                 leading: Icon(Icons.desktop_windows),
                                 title: Text("Configurazione 1"),
                               ),
-                              const ListTile(
+                              ListTile(
                                 leading: Icon(Icons.desktop_windows),
                                 title: Text("Configurazione 2"),
                               ),
-                              const ListTile(
+                              ListTile(
                                 leading: Icon(Icons.desktop_windows),
                                 title: Text("Configurazione 3"),
                               ),
                             ],
-                          )
+                          ),
                         ],
                       ),
                     ),
