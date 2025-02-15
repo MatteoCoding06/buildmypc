@@ -6,6 +6,7 @@ class AuthService {
   // REGISTRAZIONE UTENTE
   Future<String?> signUp(String email, String password) async {
     try {
+      // ignore: unused_local_variable
       final response =
           await supabase.auth.signUp(email: email, password: password);
       return null; // Nessun errore

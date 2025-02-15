@@ -1,3 +1,4 @@
+import 'package:buildmypc/screens/my_configurations.dart';
 import 'package:flutter/material.dart';
 import 'package:buildmypc/screens/auth_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -30,14 +31,26 @@ class ProfileScreen extends StatelessWidget {
               child: ListView(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                children: const [
+                children: [
                   ListTile(
                     leading: Icon(Icons.person),
                     title: Text("Elemento 1A"),
                   ),
-                  ListTile(
-                    title: Text("Configurazioni personali"),
-                    trailing: Icon(Icons.keyboard_arrow_right),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SavedBuildsPage(
+                              // Passaggio delle build
+                              ),
+                        ),
+                      );
+                    },
+                    child: ListTile(
+                      title: Text("Configurazioni personali"),
+                      trailing: Icon(Icons.keyboard_arrow_right),
+                    ),
                   ),
                 ],
               ),

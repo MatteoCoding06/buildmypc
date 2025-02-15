@@ -1,3 +1,4 @@
+import 'package:buildmypc/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PcBuild {
@@ -15,6 +16,7 @@ class PcBuild {
   final int psuId;
   final double totalPrice;
   final DateTime createdAt;
+  final bool isPublic;
 
   PcBuild({
     required this.id,
@@ -31,6 +33,7 @@ class PcBuild {
     required this.psuId,
     required this.totalPrice,
     required this.createdAt,
+    required this.isPublic,
   });
 
   Map<String, dynamic> toJson() => {
@@ -48,6 +51,7 @@ class PcBuild {
         'psu_id': psuId,
         'total_price': totalPrice,
         'created_at': createdAt.toIso8601String(),
+        'is_public': isPublic,
       };
 
   factory PcBuild.fromJson(Map<String, dynamic> json) => PcBuild(
@@ -65,6 +69,7 @@ class PcBuild {
         psuId: json['psu_id'],
         totalPrice: json['total_price'],
         createdAt: DateTime.parse(json['created_at']),
+        isPublic: json['is_public'],
       );
 }
 
@@ -174,5 +179,15 @@ class BuildService {
     } catch (e) {
       throw Exception('Failed to update build: $e');
     }
+  }
+
+  Future<List<PcBuild>> getPublicBuilds() async {
+    final response = await AuthService()
+        .supabase
+        .from('pc_builds')
+        .select()
+        .eq('is_public', true); // Filtra solo le build pubbliche
+
+    return response.map<PcBuild>((json) => PcBuild.fromJson(json)).toList();
   }
 }

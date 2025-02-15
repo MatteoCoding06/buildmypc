@@ -6,6 +6,7 @@ import 'package:buildmypc/models/motherboard.dart';
 import 'package:buildmypc/models/psu.dart';
 import 'package:buildmypc/models/ram.dart';
 import 'package:buildmypc/models/storage.dart';
+import 'package:buildmypc/screens/component_details_screen.dart';
 import 'package:buildmypc/services/auth_service.dart';
 import 'package:buildmypc/services/pc_build_service.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,7 @@ class _BuildDetailPageState extends State<BuildDetailPage> {
   Gpu? selectedGpu;
   Case? selectedCase;
   Psu? selectedPsu;
+  bool isLoading = true; // Stato di caricamento
 
   @override
   void initState() {
@@ -36,17 +38,27 @@ class _BuildDetailPageState extends State<BuildDetailPage> {
   }
 
   Future<void> _loadComponentDetails() async {
-    selectedCpu = await getCpuById(widget.build.cpuId);
-    selectedCooler = await getCoolerById(widget.build.coolerId!);
-    selectedMotherboard = await getMotherboardById(widget.build.motherboardId);
-    selectedRam = await getRamById(widget.build.ramId);
-    selectedStorage = await getStorageById(widget.build.storageId);
-    selectedGpu = await getGpuById(widget.build.gpuId!);
-    selectedCase = await getCaseById(widget.build.caseId);
-    selectedPsu = await getPsuById(widget.build.psuId);
-
-    // Aggiorna lo stato dopo aver caricato i componenti
-    setState(() {});
+    try {
+      selectedCpu = await getCpuById(widget.build.cpuId);
+      selectedCooler = await getCoolerById(widget.build.coolerId!);
+      selectedMotherboard =
+          await getMotherboardById(widget.build.motherboardId);
+      selectedRam = await getRamById(widget.build.ramId);
+      selectedStorage = await getStorageById(widget.build.storageId);
+      selectedGpu = await getGpuById(widget.build.gpuId!);
+      selectedCase = await getCaseById(widget.build.caseId);
+      selectedPsu = await getPsuById(widget.build.psuId);
+    } catch (error) {
+      // Gestione degli errori in caso di problemi con le chiamate API
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Errore nel recupero dei dettagli della build")),
+      );
+    } finally {
+      // Aggiorna lo stato per far sapere che il caricamento è finito
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -55,42 +67,72 @@ class _BuildDetailPageState extends State<BuildDetailPage> {
       appBar: AppBar(title: Text(widget.build.name)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildDetailRow("CPU", selectedCpu?.name),
-            _buildDetailRow("Dissipatore", selectedCooler?.name),
-            _buildDetailRow("Scheda Madre", selectedMotherboard?.name),
-            _buildDetailRow("RAM", selectedRam?.name),
-            _buildDetailRow("Storage", selectedStorage?.name),
-            _buildDetailRow("GPU", selectedGpu?.name),
-            _buildDetailRow("Case", selectedCase?.name),
-            _buildDetailRow("Alimentatore", selectedPsu?.name),
-            const Divider(),
-            Text(
-              "Prezzo Totale: \$${widget.build.totalPrice.toStringAsFixed(2)}",
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        child: isLoading
+            ? Center(
+                child: CircularProgressIndicator()) // Indicatore di caricamento
+            : SingleChildScrollView(
+                // ScrollView per contenere il contenuto
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildDetailRow("CPU", selectedCpu),
+                    _buildDetailRow("Dissipatore", selectedCooler),
+                    _buildDetailRow("Scheda Madre", selectedMotherboard),
+                    _buildDetailRow("RAM", selectedRam),
+                    _buildDetailRow("Storage", selectedStorage),
+                    _buildDetailRow("GPU", selectedGpu),
+                    _buildDetailRow("Case", selectedCase),
+                    _buildDetailRow("Alimentatore", selectedPsu),
+                    const Divider(),
+                    Text(
+                      "Prezzo Totale: \$${widget.build.totalPrice.toStringAsFixed(2)}",
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, dynamic component) {
+    return GestureDetector(
+      onTap: () {
+        if (component != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ComponentDetailsScreen(
+                component: component,
+              ),
             ),
-          ],
+          );
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          color: Colors.white,
+          child: ListTile(
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            title: Text(label,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle:
+                Text(component?.name ?? "N/A"), // Accede al nome dell'oggetto
+            trailing: const Icon(Icons.arrow_forward),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildDetailRow(String label, String? value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-          Text(value ?? "N/A"),
-        ],
-      ),
-    );
-  }
-
-// Funzioni per ottenere gli oggetti completi (esempio con CPU)
+  // Funzioni per ottenere gli oggetti completi (esempio con CPU)
   Future<Cpu> getCpuById(int cpuId) async {
     final response = await AuthService()
         .supabase

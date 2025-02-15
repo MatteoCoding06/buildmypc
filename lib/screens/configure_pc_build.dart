@@ -651,8 +651,8 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
     );
   }
 
-  void _showLoadBuildDialog() {
-    _loadUserBuilds(); // Carica le build prima di mostrare il dialogo
+  void _showLoadBuildDialog() async {
+    await _loadUserBuilds(); // Carica le build prima di mostrare il dialogo
 
     showDialog(
       context: context,
@@ -710,7 +710,6 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
   }
 
   void _showSaveBuildDialog() {
-    // Verifica se l'utente è autenticato
     final user = AuthService().supabase.auth.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -720,7 +719,6 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
           action: SnackBarAction(
             label: 'Login',
             onPressed: () {
-              // Naviga alla pagina di login
               MaterialPageRoute(builder: (context) => const AuthScreen());
             },
           ),
@@ -734,94 +732,117 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Salva Build'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Nome della build',
-                hintText: 'Es: Gaming Build 2025',
+      builder: (context) {
+        bool isPublic = false; // Inizializza lo stato locale
+
+        return StatefulBuilder(
+          // Utilizza StatefulBuilder per gestire lo stato
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Salva Build'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Nome della build',
+                      hintText: 'Es: Gaming Build 2025',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: descriptionController,
+                    decoration: const InputDecoration(
+                      labelText: 'Descrizione (opzionale)',
+                      hintText: 'Es: Build per gaming ad alte prestazioni',
+                    ),
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: 16),
+                  SwitchListTile(
+                    title: const Text('Rendi la build pubblica'),
+                    value: isPublic,
+                    onChanged: (value) {
+                      setState(() {
+                        isPublic = value; // Aggiorna lo stato correttamente
+                      });
+                    },
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Descrizione (opzionale)',
-                hintText: 'Es: Build per gaming ad alte prestazioni',
-              ),
-              maxLines: 3,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annulla'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              if (nameController.text.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('Inserisci un nome per la build')),
-                );
-                return;
-              }
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Annulla'),
+                ),
+                FilledButton(
+                  onPressed: () async {
+                    if (nameController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Inserisci un nome per la build')),
+                      );
+                      return;
+                    }
 
-              if (selectedCpu == null ||
-                  selectedMotherboard == null ||
-                  selectedRam == null ||
-                  selectedStorage == null ||
-                  selectedCase == null ||
-                  selectedPsu == null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('Seleziona tutti i componenti essenziali')),
-                );
-                return;
-              }
+                    if (selectedCpu == null ||
+                        selectedMotherboard == null ||
+                        selectedRam == null ||
+                        selectedStorage == null ||
+                        selectedCase == null ||
+                        selectedPsu == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text(
+                                'Seleziona tutti i componenti essenziali')),
+                      );
+                      return;
+                    }
 
-              try {
-                final build = PcBuild(
-                  id: const Uuid().v4(), // Genera un UUID univoco per la build
-                  userId: user.id, // ID dell'utente corrente
-                  name: nameController.text,
-                  description: descriptionController.text.isEmpty
-                      ? null
-                      : descriptionController.text,
-                  cpuId: selectedCpu!.id,
-                  coolerId: selectedCooler?.id,
-                  motherboardId: selectedMotherboard!.id,
-                  ramId: selectedRam!.id,
-                  storageId: selectedStorage!.id,
-                  gpuId: selectedGpu?.id,
-                  caseId: selectedCase!.id,
-                  psuId: selectedPsu!.id,
-                  totalPrice: totalPrice,
-                  createdAt: DateTime.now(),
-                );
+                    try {
+                      final build = PcBuild(
+                        id: const Uuid().v4(),
+                        userId: user.id,
+                        name: nameController.text,
+                        description: descriptionController.text.isEmpty
+                            ? null
+                            : descriptionController.text,
+                        cpuId: selectedCpu!.id,
+                        coolerId: selectedCooler?.id,
+                        motherboardId: selectedMotherboard!.id,
+                        ramId: selectedRam!.id,
+                        storageId: selectedStorage!.id,
+                        gpuId: selectedGpu?.id,
+                        caseId: selectedCase!.id,
+                        psuId: selectedPsu!.id,
+                        totalPrice: totalPrice,
+                        createdAt: DateTime.now(),
+                        isPublic: isPublic, // Salva lo stato pubblico/privato
+                      );
 
-                final buildService = BuildService(AuthService().supabase);
-                await buildService.saveBuild(build);
+                      final buildService = BuildService(AuthService().supabase);
+                      await buildService.saveBuild(build);
 
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Build salvata con successo!')),
-                );
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Errore durante il salvataggio: $e')),
-                );
-              }
-            },
-            child: const Text('Salva'),
-          ),
-        ],
-      ),
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Build salvata con successo!')),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text('Errore durante il salvataggio: $e')),
+                      );
+                    }
+                  },
+                  child: const Text('Salva'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
@@ -910,12 +931,13 @@ class _ConfigurePcBuildState extends State<ConfigurePcBuild> {
 
   List<PcBuild> userBuilds = [];
 
-  void _loadUserBuilds() async {
+// Modifica anche _loadUserBuilds per ritornare Future
+  Future<void> _loadUserBuilds() async {
     try {
       final loadedConfig =
           await BuildService(AuthService().supabase).getUserBuilds();
       setState(() {
-        userBuilds = loadedConfig; // Aggiungi tutte le build caricate
+        userBuilds = loadedConfig;
       });
     } catch (e) {
       print("Errore nel caricare le build: $e");

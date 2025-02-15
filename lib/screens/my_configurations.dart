@@ -81,20 +81,30 @@ class _SavedBuildsPageState extends State<SavedBuildsPage> {
                           ),
                         ],
                       ),
-                      child: ListTile(
-                        title: Text(build.name),
-                        subtitle:
-                            Text("\$${build.totalPrice.toStringAsFixed(2)}"),
-                        trailing: const Icon(Icons.arrow_forward),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  BuildDetailPage(build: build),
-                            ),
-                          );
-                        },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Card(
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          color: Colors.white,
+                          child: ListTile(
+                            title: Text(build.name),
+                            subtitle: Text(
+                                "\$${build.totalPrice.toStringAsFixed(2)}"),
+                            trailing: const Icon(Icons.arrow_forward),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      BuildDetailPage(build: build),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
                       ),
                     );
                   },
