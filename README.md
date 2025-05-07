@@ -1,7 +1,3 @@
-Certo! Ecco una descrizione adatta per la **GitHub README** di un'app chiamata **BuildMyPC**:
-
----
-
 ## 🖥️ BuildMyPC
 
 **BuildMyPC** è un'app pensata per aiutarti a creare il tuo PC perfetto, selezionando solo componenti compatibili tra loro. Che tu sia un principiante o un appassionato esperto, BuildMyPC ti guida passo dopo passo nella scelta delle migliori configurazioni per le tue esigenze di gaming, lavoro o uso quotidiano.
@@ -16,10 +12,9 @@ Certo! Ecco una descrizione adatta per la **GitHub README** di un'app chiamata *
 
 ### 🔧 Tech stack
 
-* **Frontend**: Flutter / React / \[specifica qui la tua scelta]
-* **Backend**: Firebase / Supabase / Node.js / \[specifica qui]
-* **Database**: Firestore / PostgreSQL / \[altro]
-* **API**: \[opzionale - es. PCPartPicker, custom API]
+* **Frontend**: Flutter
+* **Backend**: Supabase
+* **Database**: PostgreSQL
 
 ### 👨‍💻 Obiettivo
 
@@ -29,6 +24,3 @@ L'obiettivo di BuildMyPC è rendere l'assemblaggio di un computer accessibile, s
 
 🚧 L'app è attualmente in sviluppo. Se vuoi contribuire o testarla, sei il benvenuto!
 
----
-
-Posso personalizzarlo ulteriormente se mi dici con quale stack stai lavorando o se è un progetto scolastico, personale o commerciale. Vuoi includere anche un logo o uno slogan?
