@@ -1,20 +1,34 @@
-<<<<<<< HEAD
-# buildmypc
-=======
-# buildmypc
+Certo! Ecco una descrizione adatta per la **GitHub README** di un'app chiamata **BuildMyPC**:
 
-A new Flutter project.
+---
 
-## Getting Started
+## 🖥️ BuildMyPC
 
-This project is a starting point for a Flutter application.
+**BuildMyPC** è un'app pensata per aiutarti a creare il tuo PC perfetto, selezionando solo componenti compatibili tra loro. Che tu sia un principiante o un appassionato esperto, BuildMyPC ti guida passo dopo passo nella scelta delle migliori configurazioni per le tue esigenze di gaming, lavoro o uso quotidiano.
 
-A few resources to get you started if this is your first Flutter project:
+### 🚀 Funzionalità principali
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+* 🧩 Selezione guidata dei componenti: CPU, GPU, RAM, storage, case, alimentatore e altro
+* ✅ Verifica automatica della compatibilità tra i componenti
+* 📊 Stima delle prestazioni e del consumo energetico
+* 💾 Salvataggio e condivisione delle configurazioni
+* 🔍 Filtri avanzati per prezzo, brand, specifiche tecniche
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
->>>>>>> 981be09 (Initial commit)
+### 🔧 Tech stack
+
+* **Frontend**: Flutter / React / \[specifica qui la tua scelta]
+* **Backend**: Firebase / Supabase / Node.js / \[specifica qui]
+* **Database**: Firestore / PostgreSQL / \[altro]
+* **API**: \[opzionale - es. PCPartPicker, custom API]
+
+### 👨‍💻 Obiettivo
+
+L'obiettivo di BuildMyPC è rendere l'assemblaggio di un computer accessibile, semplice e affidabile, anche per chi non ha esperienza. Ogni componente viene valutato per garantire compatibilità e prestazioni ottimali.
+
+### 📦 Work in progress
+
+🚧 L'app è attualmente in sviluppo. Se vuoi contribuire o testarla, sei il benvenuto!
+
+---
+
+Posso personalizzarlo ulteriormente se mi dici con quale stack stai lavorando o se è un progetto scolastico, personale o commerciale. Vuoi includere anche un logo o uno slogan?
