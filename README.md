@@ -6,15 +6,13 @@
 
 * 🧩 Selezione guidata dei componenti: CPU, GPU, RAM, storage, case, alimentatore e altro
 * ✅ Verifica automatica della compatibilità tra i componenti
-* 📊 Stima delle prestazioni e del consumo energetico
 * 💾 Salvataggio e condivisione delle configurazioni
-* 🔍 Filtri avanzati per prezzo, brand, specifiche tecniche
+* 🔍 Filtri avanzati
 
 ### 🔧 Tech stack
 
 * **Frontend**: Flutter
 * **Backend**: Supabase
-* **Database**: PostgreSQL
 
 ### 👨‍💻 Obiettivo
 
